@@ -135,10 +135,11 @@ export class TouchCanvas {
   }
 
   private circles: TouchCircle[] = [];
-
+  private circleCallbacks: ButtonHandler[] = [];
   addCircle(x: number, y: number, r: number, h: ButtonHandler,
     enableSet: TouchLine[]) {
     this.circles.push(new TouchCircle(new THREE.Vector2(x, y), r, enableSet));
+    this.circleCallbacks.push(h);
   }
 
   private lines: TouchLine[] = [];
@@ -176,8 +177,16 @@ export class TouchCanvas {
   }
 
   private newPosition = new THREE.Vector2();
+  private wasActive = new Set<number>();
+  private nowActive = new Set<number>();
   private updateTouchPositions(touches: TouchList) {
-    for (const circle of this.circles) {
+    this.wasActive.clear();
+    this.nowActive.clear();
+    for (let i = 0; i < this.circles.length; ++i) {
+      const circle = this.circles[i];
+      if (circle.active()) {
+        this.wasActive.add(i);
+      }
       circle.setActive(false);
     }
     for (const touch of touches) {
@@ -197,12 +206,26 @@ export class TouchCanvas {
       } else {
         touchPosition = new THREE.Vector2(touch.clientX, touch.clientY);
         this.currentPositions.set(touch.identifier, touchPosition);
-        // Touch started
       }
-      for (const circle of this.circles) {
+      for (let i = 0; i < this.circles.length; ++i) {
+        const circle = this.circles[i];
         if (!circle.active() && circle.inside(touchPosition)) {
           circle.setActive(true);
         }
+      }
+    }
+    for (let i = 0; i < this.circles.length; ++i) {
+      const circle = this.circles[i];
+      if (circle.active()) {
+        this.nowActive.add(i);
+        if (!this.wasActive.has(i)) {
+          this.circleCallbacks[i]('on');
+        }
+      }
+    }
+    for (const i of this.wasActive) {
+      if (!this.nowActive.has(i)) {
+        this.circleCallbacks[i]('off');
       }
     }
   }

@@ -2,6 +2,66 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 148:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AutoHarp = void 0;
+class AutoHarp {
+    constructor(tc, organ) {
+        const allPipes = [];
+        const lineMap = new Map();
+        {
+            const stride = 8;
+            let x = 800;
+            let y = 88 * stride + 20;
+            for (let i = 0; i < 88; ++i) {
+                const l = tc.addLine(x, y, x + 200, y, (et) => {
+                    switch (et) {
+                        case 'on':
+                            organ.pluck(i);
+                            break;
+                        case 'off':
+                            organ.mute(i);
+                            break;
+                    }
+                });
+                lineMap.set(i, l);
+                allPipes.push(l);
+                y -= stride;
+            }
+        }
+        {
+            const stride = 120;
+            const radius = 90;
+            let noteMods = [2, 5, 1]; // D F C#
+            for (let j = 0; j < 3; ++j) {
+                let noteMod = noteMods[j];
+                for (let i = 0; i < 6; ++i) {
+                    let y = j * stride * (Math.sqrt(3.0) / 2.0) + radius;
+                    let x = i * stride + radius;
+                    if (j % 2 != 0) {
+                        x += stride / 2.0;
+                    }
+                    const pipes = [];
+                    for (let i = 0; i < 88; ++i) {
+                        if ((i + 21) % 12 == noteMod) { // Add 21 because that is A0.
+                            pipes.push(allPipes[i]);
+                        }
+                    }
+                    tc.addCircle(x, y, radius, (et) => { }, pipes);
+                    noteMod = (noteMod + 7) % 12;
+                }
+            }
+        }
+    }
+}
+exports.AutoHarp = AutoHarp;
+//# sourceMappingURL=autoharp.js.map
+
+/***/ }),
+
 /***/ 138:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -16,7 +76,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+const autoharp_1 = __webpack_require__(148);
 const midiHelper_1 = __webpack_require__(398);
+const octotonic_1 = __webpack_require__(500);
 const organ_1 = __webpack_require__(58);
 const touchCanvas_1 = __webpack_require__(448);
 const button = document.createElement('button');
@@ -33,50 +95,17 @@ button.addEventListener('click', () => __awaiter(void 0, void 0, void 0, functio
     document.body.appendChild(canvas);
     const tc = new touchCanvas_1.TouchCanvas(canvas);
     const organ = new organ_1.Organ(audioContext);
-    const allPipes = [];
-    const lineMap = new Map();
     {
-        const stride = 8;
-        let x = 800;
-        let y = 88 * stride + 20;
-        for (let i = 0; i < 88; ++i) {
-            const l = tc.addLine(x, y, x + 200, y, (et) => {
-                switch (et) {
-                    case 'on':
-                        organ.pluck(i);
-                        break;
-                    case 'off':
-                        organ.mute(i);
-                        break;
-                }
-            });
-            lineMap.set(i, l);
-            allPipes.push(l);
-            y -= stride;
-        }
+        const button = document.createElement('button');
+        button.textContent = 'Autoharp';
+        document.body.appendChild(button);
+        button.addEventListener('click', () => { new autoharp_1.AutoHarp(tc, organ); });
     }
     {
-        const stride = 120;
-        const radius = 90;
-        let noteMods = [2, 5, 1]; // D F C#
-        for (let j = 0; j < 3; ++j) {
-            let noteMod = noteMods[j];
-            for (let i = 0; i < 6; ++i) {
-                let y = j * stride * (Math.sqrt(3.0) / 2.0) + radius;
-                let x = i * stride + radius;
-                if (j % 2 != 0) {
-                    x += stride / 2.0;
-                }
-                const pipes = [];
-                for (let i = 0; i < 88; ++i) {
-                    if ((i + 21) % 12 == noteMod) { // Add 21 because that is A0.
-                        pipes.push(allPipes[i]);
-                    }
-                }
-                tc.addCircle(x, y, radius, (et) => { }, pipes);
-                noteMod = (noteMod + 7) % 12;
-            }
-        }
+        const button = document.createElement('button');
+        button.textContent = 'Octotonic';
+        document.body.appendChild(button);
+        button.addEventListener('click', () => { new octotonic_1.Octotonic(tc, organ); });
     }
 }));
 //# sourceMappingURL=index.js.map
@@ -138,6 +167,39 @@ class MIDIHelper {
 }
 exports.MIDIHelper = MIDIHelper;
 //# sourceMappingURL=midiHelper.js.map
+
+/***/ }),
+
+/***/ 500:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Octotonic = void 0;
+class Octotonic {
+    constructor(tc, organ) {
+        let j = 0;
+        const stride = 95;
+        const radius = 50;
+        for (let i = 0; i < 48; ++i) {
+            const x = (Math.floor(i / 3) + 0.5 * j) * stride + radius;
+            const y = (4 - j) * stride * Math.sqrt(3) / 2;
+            tc.addCircle(x, y, radius, (et) => {
+                switch (et) {
+                    case 'on':
+                        organ.pluck(i + 30);
+                        break;
+                    case 'off':
+                        organ.mute(i + 30);
+                        break;
+                }
+            }, []);
+            j = (j + 1) % 3;
+        }
+    }
+}
+exports.Octotonic = Octotonic;
+//# sourceMappingURL=octotonic.js.map
 
 /***/ }),
 
@@ -336,9 +398,12 @@ class TouchCanvas {
         this.canvas = canvas;
         this.currentPositions = new Map();
         this.circles = [];
+        this.circleCallbacks = [];
         this.lines = [];
         this.lineCallbacks = [];
         this.newPosition = new THREE.Vector2();
+        this.wasActive = new Set();
+        this.nowActive = new Set();
         this.latestIds = new Set();
         this.ctx = canvas.getContext('2d');
         canvas.addEventListener('touchstart', (ev) => { this.handleStart(ev); });
@@ -348,6 +413,7 @@ class TouchCanvas {
     }
     addCircle(x, y, r, h, enableSet) {
         this.circles.push(new TouchCircle(new THREE.Vector2(x, y), r, enableSet));
+        this.circleCallbacks.push(h);
     }
     addLine(x0, y0, x1, y1, h) {
         const line = new TouchLine(new THREE.Vector2(x0, y0), new THREE.Vector2(x1, y1));
@@ -378,7 +444,13 @@ class TouchCanvas {
         requestAnimationFrame(() => { this.render(); });
     }
     updateTouchPositions(touches) {
-        for (const circle of this.circles) {
+        this.wasActive.clear();
+        this.nowActive.clear();
+        for (let i = 0; i < this.circles.length; ++i) {
+            const circle = this.circles[i];
+            if (circle.active()) {
+                this.wasActive.add(i);
+            }
             circle.setActive(false);
         }
         for (const touch of touches) {
@@ -398,12 +470,26 @@ class TouchCanvas {
             else {
                 touchPosition = new THREE.Vector2(touch.clientX, touch.clientY);
                 this.currentPositions.set(touch.identifier, touchPosition);
-                // Touch started
             }
-            for (const circle of this.circles) {
+            for (let i = 0; i < this.circles.length; ++i) {
+                const circle = this.circles[i];
                 if (!circle.active() && circle.inside(touchPosition)) {
                     circle.setActive(true);
                 }
+            }
+        }
+        for (let i = 0; i < this.circles.length; ++i) {
+            const circle = this.circles[i];
+            if (circle.active()) {
+                this.nowActive.add(i);
+                if (!this.wasActive.has(i)) {
+                    this.circleCallbacks[i]('on');
+                }
+            }
+        }
+        for (const i of this.wasActive) {
+            if (!this.nowActive.has(i)) {
+                this.circleCallbacks[i]('off');
             }
         }
     }
