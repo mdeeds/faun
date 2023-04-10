@@ -187,7 +187,7 @@ export class TouchCanvas {
         this.newPosition.set(touch.clientX, touch.clientY);
         for (let i = 0; i < this.lines.length; ++i) {
           const l = this.lines[i];
-          if (l.crosses(touchPosition, this.newPosition)) {
+          if (l.isEnabled() && l.crosses(touchPosition, this.newPosition)) {
             console.log(`Cross ${i}`);
             this.lineCallbacks[i]('on');
           }

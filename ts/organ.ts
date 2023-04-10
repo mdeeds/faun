@@ -1,6 +1,7 @@
 export class Organ {
   private pipes: GainNode[] = [];
   constructor(private audioCtx: AudioContext) {
+    const gainOut = new GainNode(audioCtx, { gain: 0.2 });
     // A0 = 21 = 27.5 Hz
     for (let i = 0; i < 88; ++i) {
       const note = 21 + i;
@@ -9,9 +10,10 @@ export class Organ {
       osc.start();
       const pipe = new GainNode(audioCtx, { gain: 0 });
       osc.connect(pipe);
-      pipe.connect(audioCtx.destination);
+      pipe.connect(gainOut);
       this.pipes.push(pipe);
     }
+    gainOut.connect(audioCtx.destination);
   }
 
   pluck(i: number) {
@@ -19,7 +21,7 @@ export class Organ {
     const pipe = this.pipes[i];
     const fullTime = this.audioCtx.currentTime + 0.05;
     pipe.gain.linearRampToValueAtTime(1.0, fullTime);
-    pipe.gain.setTargetAtTime(0.0, fullTime, 3.0);
+    pipe.gain.setTargetAtTime(0.0, fullTime, 0.5);
   }
 
   mute(i: number) {
