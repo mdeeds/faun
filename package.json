@@ -1,0 +1,25 @@
+{
+  "name": "faun",
+  "version": "1.0.0",
+  "description": "A Versitile MIDI controller",
+  "main": "dist/index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mdeeds/faun.git"
+  },
+  "author": "Matt Deeds",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mdeeds/faun/issues"
+  },
+  "homepage": "https://github.com/mdeeds/faun#readme",
+  "devDependencies": {
+    "@types/three": "^0.150.1"
+  },
+  "dependencies": {
+    "three": "^0.151.3"
+  }
+}
