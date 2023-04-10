@@ -1,13 +1,39 @@
 import * as THREE from "three";
 
-class TouchLine {
+export class TouchLine {
   private dir = new THREE.Vector2();
   private length: number;
+  private enableCount = 0;
   constructor(private a: THREE.Vector2, private b: THREE.Vector2) {
     this.dir.copy(b);
     this.dir.sub(a);
     this.length = this.dir.length();
     this.dir.normalize();
+  }
+
+  isEnabled(): boolean {
+    return this.enableCount > 0;
+  }
+
+  decrement() {
+    this.enableCount--;
+  }
+
+  increment() {
+    this.enableCount++;
+  }
+
+  render(ctx: CanvasRenderingContext2D) {
+    if (this.isEnabled()) {
+      ctx.strokeStyle = '#000';
+    } else {
+      ctx.strokeStyle = '#0004'
+    }
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(this.a.x, this.a.y);
+    ctx.lineTo(this.b.x, this.b.y);
+    ctx.stroke();
   }
 
   private tmp = new THREE.Vector2();
@@ -20,6 +46,8 @@ class TouchLine {
     if (len < 0 || len > this.length) {
       // Beyond the extent 
       return 0.0;
+    } else {
+      return this.dir.cross(this.tmp);
     }
   }
 
@@ -51,7 +79,8 @@ class TouchLine {
 }
 
 class TouchCircle {
-  constructor(private center: THREE.Vector2, private radius: number) { }
+  constructor(private center: THREE.Vector2, private radius: number,
+    private enableSet: TouchLine[]) { }
   private tmp = new THREE.Vector2();
   private isActive = false;
 
@@ -62,7 +91,17 @@ class TouchCircle {
   }
 
   setActive(active: boolean) {
+    if (active == this.isActive) return;
     this.isActive = active;
+    if (active) {
+      for (const l of this.enableSet) {
+        l.increment();
+      }
+    } else {
+      for (const l of this.enableSet) {
+        l.decrement();
+      }
+    }
   }
 
   active(): boolean { return this.isActive; }
@@ -97,8 +136,18 @@ export class TouchCanvas {
 
   private circles: TouchCircle[] = [];
 
-  addCircle(x: number, y: number, r: number, h: ButtonHandler) {
-    this.circles.push(new TouchCircle(new THREE.Vector2(x, y), r));
+  addCircle(x: number, y: number, r: number, h: ButtonHandler,
+    enableSet: TouchLine[]) {
+    this.circles.push(new TouchCircle(new THREE.Vector2(x, y), r, enableSet));
+  }
+
+  private lines: TouchLine[] = [];
+  private lineCallbacks: ButtonHandler[] = [];
+  addLine(x0: number, y0: number, x1: number, y1: number, h: ButtonHandler): TouchLine {
+    const line = new TouchLine(new THREE.Vector2(x0, y0), new THREE.Vector2(x1, y1));
+    this.lines.push(line);
+    this.lineCallbacks.push(h);
+    return line;
   }
 
   render() {
@@ -113,6 +162,9 @@ export class TouchCanvas {
     for (const c of this.circles) {
       c.render(this.ctx);
     }
+    for (const l of this.lines) {
+      l.render(this.ctx);
+    }
 
     this.ctx.fillStyle = '#f00';
     for (const [id, p] of this.currentPositions) {
@@ -123,6 +175,7 @@ export class TouchCanvas {
     requestAnimationFrame(() => { this.render(); });
   }
 
+  private newPosition = new THREE.Vector2();
   private updateTouchPositions(touches: TouchList) {
     for (const circle of this.circles) {
       circle.setActive(false);
@@ -131,6 +184,15 @@ export class TouchCanvas {
       let touchPosition: THREE.Vector2 = null;
       if (this.currentPositions.has(touch.identifier)) {
         touchPosition = this.currentPositions.get(touch.identifier);
+        this.newPosition.set(touch.clientX, touch.clientY);
+        for (let i = 0; i < this.lines.length; ++i) {
+          const l = this.lines[i];
+          if (l.crosses(touchPosition, this.newPosition)) {
+            console.log(`Cross ${i}`);
+            this.lineCallbacks[i]('on');
+          }
+        }
+
         touchPosition.set(touch.clientX, touch.clientY);
       } else {
         touchPosition = new THREE.Vector2(touch.clientX, touch.clientY);
