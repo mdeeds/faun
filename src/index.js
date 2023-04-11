@@ -14,15 +14,12 @@ const midiHelper_1 = require("./midiHelper");
 const octotonic_1 = require("./octotonic");
 const organ_1 = require("./organ");
 const touchCanvas_1 = require("./touchCanvas");
-const button = document.createElement('button');
-button.textContent = 'Go';
-document.body.appendChild(button);
-button.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
+const audioButton = document.createElement('button');
+audioButton.textContent = 'Speakers';
+document.body.appendChild(audioButton);
+audioButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
+    document.body.innerHTML = '';
     const audioContext = new AudioContext();
-    const o = yield midiHelper_1.MIDIHelper.getDefaultOutput();
-    document.body.innerHTML = '';
-    const i = yield midiHelper_1.MIDIHelper.getDefaultInput();
-    document.body.innerHTML = '';
     const canvas = document.createElement('canvas');
     canvas.classList.add('touchArea');
     document.body.appendChild(canvas);
@@ -40,5 +37,15 @@ button.addEventListener('click', () => __awaiter(void 0, void 0, void 0, functio
         document.body.appendChild(button);
         button.addEventListener('click', () => { new octotonic_1.Octotonic(tc, organ); });
     }
+}));
+const midiButton = document.createElement('button');
+midiButton.textContent = 'MIDI';
+document.body.appendChild(midiButton);
+midiButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
+    document.body.innerHTML = '';
+    const o = yield midiHelper_1.MIDIHelper.getDefaultOutput();
+    document.body.innerHTML = '';
+    const i = yield midiHelper_1.MIDIHelper.getDefaultInput();
+    document.body.innerHTML = '';
 }));
 //# sourceMappingURL=index.js.map

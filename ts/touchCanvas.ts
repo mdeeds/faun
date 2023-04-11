@@ -187,7 +187,6 @@ export class TouchCanvas {
       if (circle.active()) {
         this.wasActive.add(i);
       }
-      circle.setActive(false);
     }
     for (const touch of touches) {
       let touchPosition: THREE.Vector2 = null;
@@ -209,22 +208,22 @@ export class TouchCanvas {
       }
       for (let i = 0; i < this.circles.length; ++i) {
         const circle = this.circles[i];
-        if (!circle.active() && circle.inside(touchPosition)) {
-          circle.setActive(true);
+        if (circle.inside(touchPosition)) {
+          this.nowActive.add(i);
         }
       }
     }
-    for (let i = 0; i < this.circles.length; ++i) {
+    for (const i of this.nowActive) {
       const circle = this.circles[i];
-      if (circle.active()) {
-        this.nowActive.add(i);
-        if (!this.wasActive.has(i)) {
-          this.circleCallbacks[i]('on');
-        }
+      if (!this.wasActive.has(i)) {
+        circle.setActive(true);
+        this.circleCallbacks[i]('on');
       }
     }
     for (const i of this.wasActive) {
+      const circle = this.circles[i];
       if (!this.nowActive.has(i)) {
+        circle.setActive(false);
         this.circleCallbacks[i]('off');
       }
     }

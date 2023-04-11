@@ -81,15 +81,12 @@ const midiHelper_1 = __webpack_require__(398);
 const octotonic_1 = __webpack_require__(500);
 const organ_1 = __webpack_require__(58);
 const touchCanvas_1 = __webpack_require__(448);
-const button = document.createElement('button');
-button.textContent = 'Go';
-document.body.appendChild(button);
-button.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
+const audioButton = document.createElement('button');
+audioButton.textContent = 'Speakers';
+document.body.appendChild(audioButton);
+audioButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
+    document.body.innerHTML = '';
     const audioContext = new AudioContext();
-    const o = yield midiHelper_1.MIDIHelper.getDefaultOutput();
-    document.body.innerHTML = '';
-    const i = yield midiHelper_1.MIDIHelper.getDefaultInput();
-    document.body.innerHTML = '';
     const canvas = document.createElement('canvas');
     canvas.classList.add('touchArea');
     document.body.appendChild(canvas);
@@ -107,6 +104,16 @@ button.addEventListener('click', () => __awaiter(void 0, void 0, void 0, functio
         document.body.appendChild(button);
         button.addEventListener('click', () => { new octotonic_1.Octotonic(tc, organ); });
     }
+}));
+const midiButton = document.createElement('button');
+midiButton.textContent = 'MIDI';
+document.body.appendChild(midiButton);
+midiButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
+    document.body.innerHTML = '';
+    const o = yield midiHelper_1.MIDIHelper.getDefaultOutput();
+    document.body.innerHTML = '';
+    const i = yield midiHelper_1.MIDIHelper.getDefaultInput();
+    document.body.innerHTML = '';
 }));
 //# sourceMappingURL=index.js.map
 
@@ -451,7 +458,6 @@ class TouchCanvas {
             if (circle.active()) {
                 this.wasActive.add(i);
             }
-            circle.setActive(false);
         }
         for (const touch of touches) {
             let touchPosition = null;
@@ -473,22 +479,22 @@ class TouchCanvas {
             }
             for (let i = 0; i < this.circles.length; ++i) {
                 const circle = this.circles[i];
-                if (!circle.active() && circle.inside(touchPosition)) {
-                    circle.setActive(true);
+                if (circle.inside(touchPosition)) {
+                    this.nowActive.add(i);
                 }
             }
         }
-        for (let i = 0; i < this.circles.length; ++i) {
+        for (const i of this.nowActive) {
             const circle = this.circles[i];
-            if (circle.active()) {
-                this.nowActive.add(i);
-                if (!this.wasActive.has(i)) {
-                    this.circleCallbacks[i]('on');
-                }
+            if (!this.wasActive.has(i)) {
+                circle.setActive(true);
+                this.circleCallbacks[i]('on');
             }
         }
         for (const i of this.wasActive) {
+            const circle = this.circles[i];
             if (!this.nowActive.has(i)) {
+                circle.setActive(false);
                 this.circleCallbacks[i]('off');
             }
         }
