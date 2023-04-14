@@ -1,3 +1,4 @@
+import { Arabic } from "./arabic";
 import { AutoHarp } from "./autoharp";
 import { MIDIHelper } from "./midiHelper";
 import { Octotonic } from "./octotonic";
@@ -10,22 +11,45 @@ document.body.appendChild(audioButton);
 audioButton.addEventListener('click', async () => {
   document.body.innerHTML = '';
   const audioContext = new AudioContext();
-  const canvas = document.createElement('canvas');
-  canvas.classList.add('touchArea');
-  document.body.appendChild(canvas);
-  const tc = new TouchCanvas(canvas);
   const organ = new Organ(audioContext);
   {
     const button = document.createElement('button');
     button.textContent = 'Autoharp';
     document.body.appendChild(button);
-    button.addEventListener('click', () => { new AutoHarp(tc, organ); });
+    button.addEventListener('click', () => {
+      document.body.innerHTML = '';
+      const canvas = document.createElement('canvas');
+      canvas.classList.add('touchArea');
+      document.body.appendChild(canvas);
+      const tc = new TouchCanvas(canvas);
+      new AutoHarp(tc, organ);
+    });
   }
   {
     const button = document.createElement('button');
     button.textContent = 'Octotonic';
     document.body.appendChild(button);
-    button.addEventListener('click', () => { new Octotonic(tc, organ); });
+    button.addEventListener('click', () => {
+      document.body.innerHTML = '';
+      const canvas = document.createElement('canvas');
+      canvas.classList.add('touchArea');
+      document.body.appendChild(canvas);
+      const tc = new TouchCanvas(canvas);
+      new Octotonic(tc, organ);
+    });
+  }
+  {
+    const button = document.createElement('button');
+    button.textContent = 'Arabic';
+    document.body.appendChild(button);
+    button.addEventListener('click', () => {
+      document.body.innerHTML = '';
+      const canvas = document.createElement('canvas');
+      canvas.classList.add('touchArea');
+      document.body.appendChild(canvas);
+      const tc = new TouchCanvas(canvas);
+      new Arabic(tc, organ);
+    });
   }
 });
 

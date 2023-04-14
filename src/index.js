@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const arabic_1 = require("./arabic");
 const autoharp_1 = require("./autoharp");
 const midiHelper_1 = require("./midiHelper");
 const octotonic_1 = require("./octotonic");
@@ -20,22 +21,45 @@ document.body.appendChild(audioButton);
 audioButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
     document.body.innerHTML = '';
     const audioContext = new AudioContext();
-    const canvas = document.createElement('canvas');
-    canvas.classList.add('touchArea');
-    document.body.appendChild(canvas);
-    const tc = new touchCanvas_1.TouchCanvas(canvas);
     const organ = new organ_1.Organ(audioContext);
     {
         const button = document.createElement('button');
         button.textContent = 'Autoharp';
         document.body.appendChild(button);
-        button.addEventListener('click', () => { new autoharp_1.AutoHarp(tc, organ); });
+        button.addEventListener('click', () => {
+            document.body.innerHTML = '';
+            const canvas = document.createElement('canvas');
+            canvas.classList.add('touchArea');
+            document.body.appendChild(canvas);
+            const tc = new touchCanvas_1.TouchCanvas(canvas);
+            new autoharp_1.AutoHarp(tc, organ);
+        });
     }
     {
         const button = document.createElement('button');
         button.textContent = 'Octotonic';
         document.body.appendChild(button);
-        button.addEventListener('click', () => { new octotonic_1.Octotonic(tc, organ); });
+        button.addEventListener('click', () => {
+            document.body.innerHTML = '';
+            const canvas = document.createElement('canvas');
+            canvas.classList.add('touchArea');
+            document.body.appendChild(canvas);
+            const tc = new touchCanvas_1.TouchCanvas(canvas);
+            new octotonic_1.Octotonic(tc, organ);
+        });
+    }
+    {
+        const button = document.createElement('button');
+        button.textContent = 'Arabic';
+        document.body.appendChild(button);
+        button.addEventListener('click', () => {
+            document.body.innerHTML = '';
+            const canvas = document.createElement('canvas');
+            canvas.classList.add('touchArea');
+            document.body.appendChild(canvas);
+            const tc = new touchCanvas_1.TouchCanvas(canvas);
+            new arabic_1.Arabic(tc, organ);
+        });
     }
 }));
 const midiButton = document.createElement('button');

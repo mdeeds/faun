@@ -2,6 +2,64 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 703:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Arabic = void 0;
+class Arabic {
+    constructor(tc, organ) {
+        let j = 0;
+        const stride = 95;
+        const radius = 50;
+        let x = radius;
+        const inScaleMods = new Set();
+        inScaleMods.add(1);
+        inScaleMods.add(2);
+        inScaleMods.add(3);
+        inScaleMods.add(6);
+        inScaleMods.add(7);
+        inScaleMods.add(9);
+        inScaleMods.add(10);
+        inScaleMods.add(11);
+        let lastInScale = false;
+        for (let i = 0; i < 48; ++i) {
+            let currentInScale;
+            let y;
+            if (inScaleMods.has(i % 12)) {
+                currentInScale = true;
+                y = 3 * radius;
+            }
+            else {
+                currentInScale = false;
+                y = 1 * radius;
+            }
+            if (lastInScale != currentInScale) {
+                lastInScale = currentInScale;
+                x += stride * 0.5;
+            }
+            else {
+                x += stride;
+            }
+            tc.addCircle(x, y, radius, (et) => {
+                switch (et) {
+                    case 'on':
+                        organ.pluck(i + 30);
+                        break;
+                    case 'off':
+                        organ.mute(i + 30);
+                        break;
+                }
+            }, []);
+        }
+    }
+}
+exports.Arabic = Arabic;
+//# sourceMappingURL=arabic.js.map
+
+/***/ }),
+
 /***/ 148:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -76,6 +134,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+const arabic_1 = __webpack_require__(703);
 const autoharp_1 = __webpack_require__(148);
 const midiHelper_1 = __webpack_require__(398);
 const octotonic_1 = __webpack_require__(500);
@@ -87,22 +146,45 @@ document.body.appendChild(audioButton);
 audioButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
     document.body.innerHTML = '';
     const audioContext = new AudioContext();
-    const canvas = document.createElement('canvas');
-    canvas.classList.add('touchArea');
-    document.body.appendChild(canvas);
-    const tc = new touchCanvas_1.TouchCanvas(canvas);
     const organ = new organ_1.Organ(audioContext);
     {
         const button = document.createElement('button');
         button.textContent = 'Autoharp';
         document.body.appendChild(button);
-        button.addEventListener('click', () => { new autoharp_1.AutoHarp(tc, organ); });
+        button.addEventListener('click', () => {
+            document.body.innerHTML = '';
+            const canvas = document.createElement('canvas');
+            canvas.classList.add('touchArea');
+            document.body.appendChild(canvas);
+            const tc = new touchCanvas_1.TouchCanvas(canvas);
+            new autoharp_1.AutoHarp(tc, organ);
+        });
     }
     {
         const button = document.createElement('button');
         button.textContent = 'Octotonic';
         document.body.appendChild(button);
-        button.addEventListener('click', () => { new octotonic_1.Octotonic(tc, organ); });
+        button.addEventListener('click', () => {
+            document.body.innerHTML = '';
+            const canvas = document.createElement('canvas');
+            canvas.classList.add('touchArea');
+            document.body.appendChild(canvas);
+            const tc = new touchCanvas_1.TouchCanvas(canvas);
+            new octotonic_1.Octotonic(tc, organ);
+        });
+    }
+    {
+        const button = document.createElement('button');
+        button.textContent = 'Arabic';
+        document.body.appendChild(button);
+        button.addEventListener('click', () => {
+            document.body.innerHTML = '';
+            const canvas = document.createElement('canvas');
+            canvas.classList.add('touchArea');
+            document.body.appendChild(canvas);
+            const tc = new touchCanvas_1.TouchCanvas(canvas);
+            new arabic_1.Arabic(tc, organ);
+        });
     }
 }));
 const midiButton = document.createElement('button');
