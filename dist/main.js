@@ -69,30 +69,32 @@ exports.AutoHarp = void 0;
 class AutoHarp {
     constructor(tc, organ) {
         const allPipes = [];
-        const lineMap = new Map();
+        // const lineMap = new Map<number, TouchLine>();
         {
-            const stride = 8;
-            let x = 800;
-            let y = 88 * stride + 20;
-            for (let i = 0; i < 88; ++i) {
+            const noteCount = 37;
+            const stride = 16;
+            let x = 600;
+            let y = noteCount * stride + 20;
+            const firstNote = Math.trunc((88 - noteCount) / 2);
+            for (let i = 0; i < noteCount; ++i) {
                 const l = tc.addLine(x, y, x + 200, y, (et) => {
                     switch (et) {
                         case 'on':
-                            organ.pluck(i);
+                            organ.pluck(i + firstNote);
                             break;
                         case 'off':
-                            organ.mute(i);
+                            organ.mute(i + firstNote);
                             break;
                     }
                 });
-                lineMap.set(i, l);
+                // lineMap.set(i, l);
                 allPipes.push(l);
                 y -= stride;
             }
         }
         {
-            const stride = 120;
-            const radius = 90;
+            const stride = 80;
+            const radius = 60;
             let noteMods = [2, 5, 1]; // D F C#
             for (let j = 0; j < 3; ++j) {
                 let noteMod = noteMods[j];
@@ -268,8 +270,8 @@ exports.Octotonic = void 0;
 class Octotonic {
     constructor(tc, organ) {
         let j = 0;
-        const stride = 95;
-        const radius = 50;
+        const stride = 60;
+        const radius = 30;
         for (let i = 0; i < 48; ++i) {
             const x = (Math.floor(i / 3) + 0.5 * j) * stride + radius;
             const y = (4 - j) * stride * Math.sqrt(3) / 2;

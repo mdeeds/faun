@@ -4,31 +4,33 @@ import { EventType, TouchCanvas, TouchLine } from "./touchCanvas";
 export class AutoHarp {
   constructor(tc: TouchCanvas, organ: Organ) {
     const allPipes: TouchLine[] = [];
-    const lineMap = new Map<number, TouchLine>();
+    // const lineMap = new Map<number, TouchLine>();
     {
-      const stride = 8;
-      let x = 800;
-      let y = 88 * stride + 20;
-      for (let i = 0; i < 88; ++i) {
+      const noteCount = 37;
+      const stride = 16;
+      let x = 600;
+      let y = noteCount * stride + 20;
+      const firstNote = Math.trunc((88 - noteCount) / 2);
+      for (let i = 0; i < noteCount; ++i) {
         const l = tc.addLine(x, y, x + 200, y, (et: EventType) => {
           switch (et) {
             case 'on':
-              organ.pluck(i);
+              organ.pluck(i + firstNote);
               break;
             case 'off':
-              organ.mute(i);
+              organ.mute(i + firstNote);
               break;
           }
         });
-        lineMap.set(i, l);
+        // lineMap.set(i, l);
         allPipes.push(l);
         y -= stride;
       }
     }
 
     {
-      const stride = 120;
-      const radius = 90;
+      const stride = 80;
+      const radius = 60;
       let noteMods = [2, 5, 1];  // D F C#
       for (let j = 0; j < 3; ++j) {
         let noteMod = noteMods[j];
