@@ -7,7 +7,7 @@ export class Arabic {
     const stride = 95;
     const radius = 50;
 
-    let x = radius;
+    let x = radius - stride;
 
     const inScaleMods = new Set<number>();
     inScaleMods.add(1);
